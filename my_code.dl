@@ -1,0 +1,26 @@
+
+.decl function(name:symbol, context:symbol)
+.decl calls(caller:symbol,callee:symbol,context:symbol)
+.decl extern(module: symbol, name: symbol, context:symbol)
+.decl callGraph(src: symbol, sink: symbol)
+.output callGraph
+
+callGraph(x,y) :- calls(x,y,ctx), function(y, ctx).
+callGraph(x,y) :- calls(x,y,ctx1), extern(ctx2,y,ctx1), function(y,ctx2).
+callGraph(x,z) :- callGraph(x,y), callGraph(y,z).
+
+extern("B", "foo", "A").
+function("main","A").
+calls("main","foo","A").
+
+extern("C", "bar", "B").
+extern("D", "baz", "B").
+function("foo","B").
+calls("foo","bar","B").
+calls("foo","baz","B").
+
+extern("D", "baz", "C").
+function("bar","C").
+calls("bar","baz","C").
+
+function("baz","D").
